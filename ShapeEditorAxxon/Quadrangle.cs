@@ -1,6 +1,6 @@
 ﻿namespace ShapeEditorAxxon;
 
-public class Quadrangle : IRichTextBoxWriter
+public class Quadrangle : Figure
 {
     private readonly Point _firstPoint;
     private readonly Point _secondPoint;
@@ -15,23 +15,18 @@ public class Quadrangle : IRichTextBoxWriter
         _fourthPoint = fourthPoint;
     }
 
-    public static void DrawQuadrangle(PictureBox pictureBox, Quadrangle quadrangle)
+    public override void DrawFigure(PictureBox pictureBox)
     {
-        Graphics gfx = pictureBox.CreateGraphics();
+        var gfx = pictureBox.CreateGraphics();
 
         var pen = new Pen(Color.Black);
         
-        gfx.DrawLine(pen, quadrangle._firstPoint, quadrangle._secondPoint);
-        gfx.DrawLine(pen, quadrangle._secondPoint, quadrangle._thirdPoint);
-        gfx.DrawLine(pen, quadrangle._thirdPoint, quadrangle._fourthPoint);
-        gfx.DrawLine(pen, quadrangle._fourthPoint, quadrangle._firstPoint);
+        gfx.DrawLine(pen, _firstPoint, _secondPoint);
+        gfx.DrawLine(pen, _secondPoint, _thirdPoint);
+        gfx.DrawLine(pen, _thirdPoint, _fourthPoint);
+        gfx.DrawLine(pen, _fourthPoint, _firstPoint);
     }
 
-    public void WriteRichTextBox(RichTextBox richTextBox, string text)
-    {
-        richTextBox.AppendText(text.Replace("  ",Environment.NewLine));
-    }
-    
     public override string ToString()
     {
         var result = $"Quadrangle:  " +

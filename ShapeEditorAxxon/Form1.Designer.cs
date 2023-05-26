@@ -44,6 +44,7 @@ partial class Form1
         saveButton.Size = new Size(287, 40);
         saveButton.TabIndex = 0;
         saveButton.Text = "Save";
+        saveButton.BackColor = Color.White;
         saveButton.Click += saveButton_Click;
         // 
         // loadButton
@@ -54,6 +55,7 @@ partial class Form1
         loadButton.Size = new Size(287, 40);
         loadButton.TabIndex = 1;
         loadButton.Text = "Load";
+        loadButton.BackColor = Color.White;
         loadButton.Click += loadButton_Click;
         // 
         // textBox
@@ -90,6 +92,7 @@ partial class Form1
         squareButton.Size = new Size(287, 40);
         squareButton.TabIndex = 0;
         squareButton.Text = "Square";
+        squareButton.BackColor = Color.White;
         squareButton.Click += squareButton_Click;
         // 
         // triangleButton
@@ -100,6 +103,7 @@ partial class Form1
         triangleButton.Size = new Size(287, 40);
         triangleButton.TabIndex = 1;
         triangleButton.Text = "Triangle";
+        triangleButton.BackColor = Color.White;
         triangleButton.Click += triangleButton_Click;
         // 
         // circleButton
@@ -110,6 +114,7 @@ partial class Form1
         circleButton.Size = new Size(287, 40);
         circleButton.TabIndex = 2;
         circleButton.Text = "Circle";
+        circleButton.BackColor = Color.White;
         circleButton.Click += circleButton_Click;
         // 
         // quadrangleButton
@@ -120,6 +125,7 @@ partial class Form1
         quadrangleButton.Size = new Size(287, 40);
         quadrangleButton.TabIndex = 3;
         quadrangleButton.Text = "Quadrangle";
+        quadrangleButton.BackColor = Color.White;
         quadrangleButton.Click += QuadrangleButtonClick;
         // 
         // figureTable
@@ -156,6 +162,7 @@ partial class Form1
         pictureBox1.Size = new Size(814, 628);
         pictureBox1.TabIndex = 0;
         pictureBox1.TabStop = false;
+        pictureBox1.BackColor = Color.White;
         // 
         // drawingTable
         // 
@@ -191,6 +198,7 @@ partial class Form1
         Controls.Add(table);
         MinimumSize = new Size(1200, 800);
         Name = "Form1";
+        BackColor = Color.Gray;
         Text = "Shape editor";
         saveLoadTable.ResumeLayout(false);
         saveLoadTable.PerformLayout();
@@ -214,16 +222,17 @@ partial class Form1
     private RichTextBox richTextBox;
     private TableLayoutPanel drawingTable;
     private TableLayoutPanel table;
-    /// <summary>
-    /// 
-    /// </summary>
-    //private Point start;
-    //private bool drawing = false;
-    //Bitmap bm = new Bitmap(500, 500);
-    //Bitmap bm2 = new Bitmap(500, 500);
-    ///
+    
     private Point firstPoint;
     private Point secondPoint;
     private Point thirdPoint;
     private Point fourthPoint;
+    /// <summary>
+    /// 
+    /// </summary>
+    
+    //private Point start;
+    //private bool drawing = false;
+    //Bitmap bm = new Bitmap(500, 500);
+    //Bitmap bm2 = new Bitmap(500, 500);
 }

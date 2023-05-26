@@ -1,12 +1,18 @@
+using System.CodeDom;
+using Newtonsoft.Json;
+
 namespace ShapeEditorAxxon;
 
 public partial class Form1 : Form
 {
+    private bool _drawBorder;
+    private List<Figure> _figures = new List<Figure>();
+    
     public Form1()
     {
         InitializeComponent();
     }
-
+    
     private void squareButton_Click(object sender, EventArgs e)
     {
         MessageBox.Show(@"Put the points of the main diagonal");
@@ -27,8 +33,9 @@ public partial class Form1 : Form
         secondPoint = e.Location;
 
         var square = Square.FindAllCoordinates(firstPoint, secondPoint);
-        Square.DrawSquare(pictureBox1,square);
+        square.DrawFigure(pictureBox1);
         square.WriteRichTextBox(richTextBox,square.ToString());
+        _figures.Add(square);
 
         pictureBox1.MouseClick -= pictureBox1_MouseClick_Second;
     }
@@ -61,10 +68,10 @@ public partial class Form1 : Form
         thirdPoint = e.Location;
 
         var triangle = new Triangle(firstPoint, secondPoint, thirdPoint);
-        Triangle.DrawTriangle(pictureBox1, triangle);
+        triangle.DrawFigure(pictureBox1);
         triangle.WriteRichTextBox(richTextBox,triangle.ToString());
-        
-        
+        _figures.Add(triangle);
+
         pictureBox1.MouseClick -= pictureBox1_MouseClick_ThirdTriangle;
     }
     
@@ -88,8 +95,9 @@ public partial class Form1 : Form
         secondPoint = e.Location;
 
         var circle = new Circle(firstPoint, secondPoint);
-        Circle.DrawCircle(pictureBox1,circle);
+        circle.DrawFigure(pictureBox1);
         circle.WriteRichTextBox(richTextBox,circle.ToString());
+        _figures.Add(circle);
         
         pictureBox1.MouseClick -= pictureBox1_MouseClick_SecondCircle;
     }
@@ -130,22 +138,64 @@ public partial class Form1 : Form
         fourthPoint = e.Location;
 
         var quadrangle = new Quadrangle(firstPoint, secondPoint, thirdPoint, fourthPoint);
-        Quadrangle.DrawQuadrangle(pictureBox1, quadrangle);
+        quadrangle.DrawFigure(pictureBox1);
         quadrangle.WriteRichTextBox(richTextBox,quadrangle.ToString());
+        _figures.Add(quadrangle);
 
         pictureBox1.MouseClick -= pictureBox1_MouseClick_FourthQuadrangle;
     }
 
     private void saveButton_Click(object sender, EventArgs e)
     {
-
+        var saveFileDialog = new SaveFileDialog();
+    
+        saveFileDialog.FileName = "figures";
+        saveFileDialog.DefaultExt = ".json";
+    
+        var result = saveFileDialog.ShowDialog();
+        if (result == DialogResult.OK)
+        {
+            var filePath = saveFileDialog.FileName;
+            
+            var jsonData = JsonConvert.SerializeObject(_figures, Formatting.Indented);
+            
+            File.WriteAllText(filePath, jsonData);
+        
+            MessageBox.Show(@"The data was successfully saved.");
+        }
     }
 
     private void loadButton_Click(object sender, EventArgs e)
     {
+        var openFileDialog = new OpenFileDialog();
 
+        openFileDialog.Filter = "JSON Files (*.json)|*.json";
+        openFileDialog.DefaultExt = "json";
+
+        var result = openFileDialog.ShowDialog();
+        if (result == DialogResult.OK)
+        {
+            var filePath = openFileDialog.FileName;
+
+            if (File.Exists(filePath))
+            {
+                var jsonData = File.ReadAllText(filePath);
+
+                _figures = JsonConvert.DeserializeObject<List<Figure>>(jsonData);
+
+                foreach (var figure in _figures)
+                {
+                    MessageBox.Show(figure.ToString());
+                }
+
+                MessageBox.Show(@"The data was uploaded successfully.");
+            }
+            else
+            {
+                MessageBox.Show(@"The file you selected doesn't exist.");
+            }
+        }
     }
-
     /*private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
     {
         drawing = false;

@@ -1,6 +1,6 @@
 ﻿namespace ShapeEditorAxxon;
 
-public class Circle
+public class Circle : Figure
 {
     private readonly Point _diameterFirst;
     private readonly Point _diameterSecond;
@@ -44,21 +44,16 @@ public class Circle
 
     private float FindRadiusLength() => FindDiameterLength() / 2;
     
-    public static void DrawCircle(PictureBox pictureBox, Circle circle)
+    public override void DrawFigure(PictureBox pictureBox)
     {
-        Graphics gfx = pictureBox.CreateGraphics();
+        var gfx = pictureBox.CreateGraphics();
 
         var pen = new Pen(Color.Black);
 
-        var startPoint = circle.FindStartPoint();
-        var diameterLength = circle.FindDiameterLength();
+        var startPoint = FindStartPoint();
+        var diameterLength = FindDiameterLength();
         
         gfx.DrawEllipse(pen, startPoint.X,startPoint.Y,diameterLength,diameterLength);
-    }
-    
-    public void WriteRichTextBox(RichTextBox richTextBox, string result)
-    {
-        richTextBox.AppendText(result.Replace("  ",Environment.NewLine));
     }
 
     public override string ToString()

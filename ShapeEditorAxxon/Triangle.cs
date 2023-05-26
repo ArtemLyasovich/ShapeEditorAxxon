@@ -1,6 +1,6 @@
 ﻿namespace ShapeEditorAxxon;
 
-public class Triangle : IRichTextBoxWriter
+public class Triangle : Figure
 {
     private readonly Point _firstPoint;
     private readonly Point _secondPoint;
@@ -13,20 +13,15 @@ public class Triangle : IRichTextBoxWriter
         _thirdPoint = thirdPoint;
     }
 
-    public static void DrawTriangle(PictureBox pictureBox, Triangle triangle)
+    public override void DrawFigure(PictureBox pictureBox)
     {
-        Graphics gfx = pictureBox.CreateGraphics();
+        var gfx = pictureBox.CreateGraphics();
 
         var pen = new Pen(Color.Black);
         
-        gfx.DrawLine(pen, triangle._firstPoint,triangle._secondPoint);
-        gfx.DrawLine(pen, triangle._firstPoint,triangle._thirdPoint);
-        gfx.DrawLine(pen, triangle._secondPoint,triangle._thirdPoint);
-    }
-    
-    public void WriteRichTextBox(RichTextBox richTextBox, string result)
-    {
-        richTextBox.AppendText(result.Replace("  ",Environment.NewLine));
+        gfx.DrawLine(pen, _firstPoint, _secondPoint);
+        gfx.DrawLine(pen, _firstPoint, _thirdPoint);
+        gfx.DrawLine(pen, _secondPoint, _thirdPoint);
     }
 
     public override string ToString()

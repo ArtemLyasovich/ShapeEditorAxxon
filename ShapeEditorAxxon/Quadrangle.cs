@@ -1,11 +1,18 @@
-﻿namespace ShapeEditorAxxon;
+﻿using System.Runtime.Serialization;
 
+namespace ShapeEditorAxxon;
+
+[DataContract]
 public class Quadrangle : Figure
 {
-    private readonly Point _firstPoint;
-    private readonly Point _secondPoint;
-    private readonly Point _thirdPoint;
-    private readonly Point _fourthPoint;
+    [DataMember]
+    private Point _firstPoint;
+    [DataMember]
+    private Point _secondPoint;
+    [DataMember]
+    private Point _thirdPoint;
+    [DataMember]
+    private Point _fourthPoint;
 
     public Quadrangle(Point firstPoint, Point secondPoint, Point thirdPoint, Point fourthPoint)
     {

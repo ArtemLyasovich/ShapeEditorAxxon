@@ -1,11 +1,18 @@
-﻿namespace ShapeEditorAxxon;
+﻿using System.Runtime.Serialization;
 
+namespace ShapeEditorAxxon;
+
+[DataContract]
 public class Circle : Figure
 {
-    private readonly Point _diameterFirst;
-    private readonly Point _diameterSecond;
-    private readonly Point _center;
-    private readonly float _radius;
+    [DataMember]
+    private Point _diameterFirst;
+    [DataMember]
+    private Point _diameterSecond;
+    [DataMember]
+    private Point _center;
+    [DataMember]
+    private float _radius;
 
     public Circle(Point diameterFirst, Point diameterSecond)
     {

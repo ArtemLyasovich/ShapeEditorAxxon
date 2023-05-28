@@ -5,7 +5,6 @@ namespace ShapeEditorAxxon;
 
 public partial class Form1 : Form
 {
-    private bool _drawBorder;
     private List<Figure> _figures = new List<Figure>();
     
     public Form1()
@@ -157,7 +156,7 @@ public partial class Form1 : Form
         {
             var filePath = saveFileDialog.FileName;
             
-            var jsonData = JsonConvert.SerializeObject(_figures, Formatting.Indented);
+            var jsonData = JsonConvert.SerializeObject(_figures);
             
             File.WriteAllText(filePath, jsonData);
         

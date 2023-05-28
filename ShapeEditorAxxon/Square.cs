@@ -1,10 +1,17 @@
-﻿namespace ShapeEditorAxxon;
+﻿using System.Runtime.Serialization;
 
+namespace ShapeEditorAxxon;
+
+[DataContract]
 public class Square : Figure
 {
+    [DataMember]
     private Point _upperLeft;
+    [DataMember]
     private Point _upperRight;
+    [DataMember]
     private Point _lowerLeft;
+    [DataMember]
     private Point _lowerRight;
 
     private Square(Point upperLeft, Point upperRight, Point lowerLeft, Point lowerRight)

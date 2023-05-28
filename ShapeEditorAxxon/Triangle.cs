@@ -1,10 +1,16 @@
-﻿namespace ShapeEditorAxxon;
+﻿using System.Runtime.Serialization;
 
+namespace ShapeEditorAxxon;
+
+[DataContract]
 public class Triangle : Figure
 {
-    private readonly Point _firstPoint;
-    private readonly Point _secondPoint;
-    private readonly Point _thirdPoint;
+    [DataMember]
+    private Point _firstPoint;
+    [DataMember]
+    private Point _secondPoint;
+    [DataMember]
+    private Point _thirdPoint;
 
     public Triangle(Point firstPoint, Point secondPoint, Point thirdPoint)
     {

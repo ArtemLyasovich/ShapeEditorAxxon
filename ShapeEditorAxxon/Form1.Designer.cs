@@ -163,6 +163,9 @@ partial class Form1
         pictureBox1.TabIndex = 0;
         pictureBox1.TabStop = false;
         pictureBox1.BackColor = Color.White;
+        pictureBox1.MouseDown += pictureBox1_MouseDown;
+        pictureBox1.MouseMove += pictureBox1_MouseMove;
+        pictureBox1.MouseUp += pictureBox1_MouseUp;
         // 
         // drawingTable
         // 
@@ -230,9 +233,4 @@ partial class Form1
     /// <summary>
     /// 
     /// </summary>
-    
-    //private Point start;
-    //private bool drawing = false;
-    //Bitmap bm = new Bitmap(500, 500);
-    //Bitmap bm2 = new Bitmap(500, 500);
 }

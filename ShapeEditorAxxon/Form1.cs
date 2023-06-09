@@ -1,4 +1,3 @@
-using System.CodeDom;
 using Newtonsoft.Json;
 
 namespace ShapeEditorAxxon;
@@ -7,6 +6,12 @@ public partial class Form1 : Form
 {
     private List<Figure> _figures = new List<Figure>();
     
+    private Figure _selectedFigure;
+    private bool _isDragging;
+    
+    private Point _startLocation;
+    private Point _finishLocation;
+
     public Form1()
     {
         InitializeComponent();
@@ -14,14 +19,14 @@ public partial class Form1 : Form
     
     private void squareButton_Click(object sender, EventArgs e)
     {
-        MessageBox.Show(@"Put the points of the main diagonal");
-        
         pictureBox1.MouseClick += pictureBox1_MouseClick_First;
     }
 
     private void pictureBox1_MouseClick_First(object sender, MouseEventArgs e)
     {
         firstPoint = e.Location;
+        
+        Drawing.DrawPoint(pictureBox1,firstPoint, Color.Black);
         
         pictureBox1.MouseClick -= pictureBox1_MouseClick_First;
         pictureBox1.MouseClick += pictureBox1_MouseClick_Second;
@@ -30,9 +35,11 @@ public partial class Form1 : Form
     private void pictureBox1_MouseClick_Second(object sender, MouseEventArgs e)
     {
         secondPoint = e.Location;
+        
+        Drawing.DrawPoint(pictureBox1,secondPoint, Color.Black);
 
         var square = Square.FindAllCoordinates(firstPoint, secondPoint);
-        square.DrawFigure(pictureBox1);
+        square.FinishDrawingFigure(pictureBox1);
         square.WriteRichTextBox(richTextBox,square.ToString());
         _figures.Add(square);
 
@@ -41,14 +48,14 @@ public partial class Form1 : Form
     
     private void triangleButton_Click(object sender, EventArgs e)
     {
-        MessageBox.Show("Put 3 points");
-        
         pictureBox1.MouseClick += pictureBox1_MouseClick_FirstTriangle;
     }
     
     private void pictureBox1_MouseClick_FirstTriangle(object sender, MouseEventArgs e)
     {
         firstPoint = e.Location;
+        
+        Drawing.DrawPoint(pictureBox1,firstPoint, Color.Black);
 
         pictureBox1.MouseClick -= pictureBox1_MouseClick_FirstTriangle;
         pictureBox1.MouseClick += pictureBox1_MouseClick_SecondTriangle;
@@ -58,6 +65,9 @@ public partial class Form1 : Form
     {
         secondPoint = e.Location;
 
+        Drawing.DrawPoint(pictureBox1, secondPoint, Color.Black);
+        Drawing.DrawLine(pictureBox1, firstPoint, secondPoint, Color.Black);
+        
         pictureBox1.MouseClick -= pictureBox1_MouseClick_SecondTriangle;
         pictureBox1.MouseClick += pictureBox1_MouseClick_ThirdTriangle;
     }
@@ -67,7 +77,7 @@ public partial class Form1 : Form
         thirdPoint = e.Location;
 
         var triangle = new Triangle(firstPoint, secondPoint, thirdPoint);
-        triangle.DrawFigure(pictureBox1);
+        triangle.FinishDrawingFigure(pictureBox1);
         triangle.WriteRichTextBox(richTextBox,triangle.ToString());
         _figures.Add(triangle);
 
@@ -76,14 +86,14 @@ public partial class Form1 : Form
     
     private void circleButton_Click(object sender, EventArgs e)
     {
-        MessageBox.Show(@"Put 2 points defining the diameter");
-        
         pictureBox1.MouseClick += pictureBox1_MouseClick_FirstCircle;
     }
 
     private void pictureBox1_MouseClick_FirstCircle(object sender, MouseEventArgs e)
     {
         firstPoint = e.Location;
+
+        Drawing.DrawPoint(pictureBox1, firstPoint, Color.Black);
         
         pictureBox1.MouseClick -= pictureBox1_MouseClick_FirstCircle;
         pictureBox1.MouseClick += pictureBox1_MouseClick_SecondCircle;
@@ -92,9 +102,11 @@ public partial class Form1 : Form
     private void pictureBox1_MouseClick_SecondCircle(object sender, MouseEventArgs e)
     {
         secondPoint = e.Location;
+        
+        Drawing.DrawPoint(pictureBox1, firstPoint, Color.White);
 
         var circle = new Circle(firstPoint, secondPoint);
-        circle.DrawFigure(pictureBox1);
+        circle.FinishDrawingFigure(pictureBox1);
         circle.WriteRichTextBox(richTextBox,circle.ToString());
         _figures.Add(circle);
         
@@ -103,14 +115,14 @@ public partial class Form1 : Form
     
     private void QuadrangleButtonClick(object sender, EventArgs e)
     {
-        MessageBox.Show("Put 4 points");
-        
         pictureBox1.MouseClick += pictureBox1_MouseClick_FirstQuadrangle;
     }
     
     private void pictureBox1_MouseClick_FirstQuadrangle(object sender, MouseEventArgs e)
     {
         firstPoint = e.Location;
+        
+        Drawing.DrawPoint(pictureBox1, firstPoint, Color.Black);
         
         pictureBox1.MouseClick -= pictureBox1_MouseClick_FirstQuadrangle;
         pictureBox1.MouseClick += pictureBox1_MouseClick_SecondQuadrangle;
@@ -120,6 +132,9 @@ public partial class Form1 : Form
     {
         secondPoint = e.Location;
         
+        Drawing.DrawPoint(pictureBox1, secondPoint, Color.Black);
+        Drawing.DrawLine(pictureBox1, firstPoint, secondPoint, Color.Black);
+        
         pictureBox1.MouseClick -= pictureBox1_MouseClick_SecondQuadrangle;
         pictureBox1.MouseClick += pictureBox1_MouseClick_ThirdQuadrangle;
     }
@@ -127,6 +142,9 @@ public partial class Form1 : Form
     private void pictureBox1_MouseClick_ThirdQuadrangle(object sender, MouseEventArgs e)
     {
         thirdPoint = e.Location;
+        
+        Drawing.DrawPoint(pictureBox1, thirdPoint, Color.Black);
+        Drawing.DrawLine(pictureBox1, secondPoint, thirdPoint, Color.Black);
         
         pictureBox1.MouseClick -= pictureBox1_MouseClick_ThirdQuadrangle;
         pictureBox1.MouseClick += pictureBox1_MouseClick_FourthQuadrangle;
@@ -137,7 +155,7 @@ public partial class Form1 : Form
         fourthPoint = e.Location;
 
         var quadrangle = new Quadrangle(firstPoint, secondPoint, thirdPoint, fourthPoint);
-        quadrangle.DrawFigure(pictureBox1);
+        quadrangle.FinishDrawingFigure(pictureBox1);
         quadrangle.WriteRichTextBox(richTextBox,quadrangle.ToString());
         _figures.Add(quadrangle);
 
@@ -180,14 +198,14 @@ public partial class Form1 : Form
             {
                 var jsonData = File.ReadAllText(filePath);
 
-                _figures = JsonConvert.DeserializeObject<List<Figure>>(jsonData);
-
-                foreach (var figure in _figures)
+                try
                 {
-                    MessageBox.Show(figure.ToString());
+                    _figures = JsonConvert.DeserializeObject<List<Figure>>(jsonData);
                 }
-
-                MessageBox.Show(@"The data was uploaded successfully.");
+                catch (Exception exception)
+                {
+                    MessageBox.Show(exception.Message);
+                }
             }
             else
             {
@@ -195,38 +213,42 @@ public partial class Form1 : Form
             }
         }
     }
-    /*private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
-    {
-        drawing = false;
-        pictureBox1.Invalidate();
-    }
- 
+
     private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
     {
-        drawing = true;
+        var point = e.Location;
+
+        for (var i = _figures.Count - 1; i >= 0; i--)
+        {
+            if (_figures[i].ContainsPoint(point))
+            {
+                _selectedFigure = _figures[i];
+                _isDragging = true;
+                _startLocation = point;
+                
+                break;
+            }
+        }
     }
- 
+
     private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
     {
-        if (!drawing) return;
-        var start = new Point(e.X-200, e.Y-80);
-        bm2 = new Bitmap(bm);
-        pictureBox1.Image = bm2;
-        var g = Graphics.FromImage(bm2);
-        Pen pen = new Pen(Color.Black);
-        g.DrawLine(pen, start.X + 200, start.Y + 100, start.X + 400, start.Y + 100);//верх
-        g.DrawLine(pen, start.X + 400, start.Y + 100, start.X + 400, start.Y + 300);//право
-        g.DrawLine(pen, start.X + 200, start.Y + 100, start.X + 200, start.Y + 300);//лево
-        g.DrawLine(pen, start.X + 200, start.Y + 300, start.X + 400, start.Y + 300);//вниз
-        g.DrawLine(pen, start.X + 250, start.Y + 80, start.X + 450, start.Y + 80);//верх2
-        g.DrawLine(pen, start.X + 450, start.Y + 80, start.X + 450, start.Y + 280);//право2
-        g.DrawLine(pen, start.X + 250, start.Y + 80, start.X + 250, start.Y + 280);//лево2
-        g.DrawLine(pen, start.X + 250, start.Y + 280, start.X + 450, start.Y + 280);//вниз
-        g.DrawLine(pen, start.X + 200, start.Y + 100, start.X + 250, start.Y + 80);
-        g.DrawLine(pen, start.X + 400, start.Y + 100, start.X + 450, start.Y + 80);
-        g.DrawLine(pen, start.X + 200, start.Y + 300, start.X + 250, start.Y + 280);
-        g.DrawLine(pen, start.X + 400, start.Y + 300, start.X + 450, start.Y + 280);
-        g.Dispose(); 
-        pictureBox1.Invalidate();
-    }*/
+        if (_isDragging)
+        {
+            _selectedFigure.PaintOverFigure(pictureBox1);
+            
+            _finishLocation = e.Location;
+            _selectedFigure.MoveFigure(pictureBox1,_startLocation,_finishLocation);
+            _startLocation = _finishLocation;
+        }
+    }
+
+    private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+    {
+        if (_isDragging)
+        {
+            _isDragging = false;
+            _selectedFigure = null;
+        }
+    }
 }

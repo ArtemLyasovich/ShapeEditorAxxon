@@ -22,6 +22,26 @@ public class Quadrangle : Figure
         _fourthPoint = fourthPoint;
     }
     
+    public Point GetFirstPoint()
+    {
+        return _firstPoint;
+    }
+
+    public Point GetSecondPoint()
+    {
+        return _secondPoint;
+    }
+
+    public Point GetThirdPoint()
+    {
+        return _thirdPoint;
+    }
+
+    public Point GetFourthPoint()
+    {
+        return _fourthPoint;
+    }
+    
     public override double CalculateArea()
     {
         var firstTriangle = new Triangle(_firstPoint, _secondPoint, _thirdPoint);
@@ -48,15 +68,7 @@ public class Quadrangle : Figure
         return Math.Abs(trianglesArea - quadrangleArea) < epsilon;
     }
 
-    public override void FinishDrawingFigure(PictureBox pictureBox)
-    {
-        Drawing.DrawPoint(pictureBox,_fourthPoint, Color.Black);
-        
-        Drawing.DrawLine(pictureBox,_thirdPoint,_fourthPoint, Color.Black);
-        Drawing.DrawLine(pictureBox, _fourthPoint, _firstPoint, Color.Black);
-    }
-
-    public override void MoveFigure(PictureBox pictureBox, Point startPoint, Point finishPoint)
+    public void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
     {
         var deltaX1 = startPoint.X - _firstPoint.X;
         var deltaY1 = startPoint.Y - _firstPoint.Y;
@@ -74,28 +86,6 @@ public class Quadrangle : Figure
         _secondPoint = new Point(finishPoint.X + deltaX2, finishPoint.Y - deltaY2);
         _thirdPoint = new Point(finishPoint.X + deltaX3, finishPoint.Y + deltaY3);
         _fourthPoint = new Point(finishPoint.X - deltaX4, finishPoint.Y + deltaY4);
-        
-        Drawing.DrawPoint(pictureBox,_firstPoint,Color.Black);
-        Drawing.DrawPoint(pictureBox,_secondPoint,Color.Black);
-        Drawing.DrawPoint(pictureBox,_thirdPoint,Color.Black);
-        
-        Drawing.DrawLine(pictureBox,_firstPoint,_secondPoint,Color.Black);
-        Drawing.DrawLine(pictureBox,_secondPoint,_thirdPoint,Color.Black);
-
-        FinishDrawingFigure(pictureBox);
-    }
-
-    public override void PaintOverFigure(PictureBox pictureBox)
-    {
-        Drawing.DrawPoint(pictureBox, _firstPoint, Color.White);
-        Drawing.DrawPoint(pictureBox, _secondPoint, Color.White);
-        Drawing.DrawPoint(pictureBox, _thirdPoint, Color.White);
-        Drawing.DrawPoint(pictureBox, _fourthPoint, Color.White);
-
-        Drawing.DrawLine(pictureBox, _firstPoint, _secondPoint, Color.White);
-        Drawing.DrawLine(pictureBox, _secondPoint, _thirdPoint, Color.White);
-        Drawing.DrawLine(pictureBox, _thirdPoint, _fourthPoint, Color.White);
-        Drawing.DrawLine(pictureBox, _fourthPoint, _firstPoint, Color.White);
     }
 
     public override string ToString()

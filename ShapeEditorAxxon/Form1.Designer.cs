@@ -1,4 +1,7 @@
-﻿namespace ShapeEditorAxxon;
+﻿using System.Timers;
+using Timer = System.Timers.Timer;
+
+namespace ShapeEditorAxxon;
 
 partial class Form1
 {
@@ -29,13 +32,20 @@ partial class Form1
         pictureBox1 = new PictureBox();
         drawingTable = new TableLayoutPanel();
         table = new TableLayoutPanel();
+        timer = new Timer();
         saveLoadTable.SuspendLayout();
         figureTable.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
         drawingTable.SuspendLayout();
         table.SuspendLayout();
         SuspendLayout();
+        //
+        // Timer
         // 
+        timer.Interval = 1000;
+        timer.Elapsed += Timer_Elapsed;
+        timer.Start();
+        //
         // saveButton
         // 
         saveButton.Dock = DockStyle.Fill;
@@ -225,7 +235,7 @@ partial class Form1
     private RichTextBox richTextBox;
     private TableLayoutPanel drawingTable;
     private TableLayoutPanel table;
-    
+
     private Point firstPoint;
     private Point secondPoint;
     private Point thirdPoint;

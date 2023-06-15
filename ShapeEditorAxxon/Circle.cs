@@ -30,7 +30,7 @@ public class Circle : Figure
         return new Point(xCenter, yCenter);
     }
     
-    private Point FindStartPoint()
+    public Point FindStartPoint()
     {
         var center = FindCenterCoordinates();
 
@@ -42,7 +42,7 @@ public class Circle : Figure
         return new Point((int)xStartPoint, (int)yStartPoint);
     }
     
-    private double FindDiameterLength()
+    public double FindDiameterLength()
     {
         var diameterLength = Mathematics.CalculateDistance(_diameterFirst, _diameterSecond);
         return diameterLength;
@@ -62,20 +62,8 @@ public class Circle : Figure
         return distance <= _radius;
 
     }
-    
-    public override void FinishDrawingFigure(PictureBox pictureBox)
-    {
-        var gfx = pictureBox.CreateGraphics();
 
-        var pen = new Pen(Color.Black, 2);
-
-        var startPoint = FindStartPoint();
-        var diameterLength = FindDiameterLength();
-        
-        gfx.DrawEllipse(pen, startPoint.X,startPoint.Y,(float)diameterLength,(float)diameterLength);
-    }
-
-    public override void MoveFigure(PictureBox pictureBox, Point startPoint, Point finishPoint)
+    public void MoveFigure(PictureBox pictureBox, Point startPoint, Point finishPoint)
     {
         var start = FindStartPoint();
         
@@ -92,24 +80,26 @@ public class Circle : Figure
 
         _center = FindCenterCoordinates();
         
-        FinishDrawingFigure(pictureBox);
+        Drawing.DrawCircle(pictureBox,this, Color.Black);
     }
 
-    public override void PaintOverFigure(PictureBox pictureBox)
+    public void FindCoordinatesfterMoving(Point startPoint, Point finishPoint)
     {
-        var gfx = pictureBox.CreateGraphics();
+        var start = FindStartPoint();
+        
+        var deltaX1 = startPoint.X - start.X;
+        var deltaY1 = startPoint.Y - start.Y;
 
-        Drawing.DrawPoint(pictureBox, _diameterFirst, Color.White);
-        Drawing.DrawPoint(pictureBox, _diameterSecond, Color.White);
+        var finishStart = new Point(finishPoint.X - deltaX1, finishPoint.Y - deltaY1);
 
-        var pen = new Pen(Color.White, 2);
+        _diameterFirst.X = finishStart.X;
+        _diameterFirst.Y = finishStart.Y + (int)_radius;
 
-        var startPoint = FindStartPoint();
-        var diameterLength = FindDiameterLength();
+        _diameterSecond.X = finishStart.X + 2 * (int)_radius;
+        _diameterSecond.Y = finishStart.Y + (int)_radius;
 
-        gfx.DrawEllipse(pen, startPoint.X, startPoint.Y, (float)diameterLength, (float)diameterLength);
+        _center = FindCenterCoordinates();
     }
-
     public override string ToString()
     {
         var result = $"Circle:  " +

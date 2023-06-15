@@ -5,13 +5,13 @@ namespace ShapeEditorAxxon;
 [DataContract]
 public class Square : Figure
 {
-    [DataMember]
+    [DataMember] 
     private Point _upperLeft;
-    [DataMember]
+    [DataMember] 
     private Point _upperRight;
-    [DataMember]
+    [DataMember] 
     private Point _lowerLeft;
-    [DataMember]
+    [DataMember] 
     private Point _lowerRight;
 
     private Square(Point upperLeft, Point upperRight, Point lowerLeft, Point lowerRight)
@@ -22,6 +22,46 @@ public class Square : Figure
         _lowerRight = lowerRight;
     }
 
+    public Point GetUpperLeft()
+    {
+        return _upperLeft;
+    }
+    
+    public Point GetUpperRight()
+    {
+        return _upperRight;
+    }
+    
+    public Point GetLowerLeft()
+    {
+        return _lowerLeft;
+    }
+    
+    public Point GetLowerRight()
+    {
+        return _lowerRight;
+    }
+//---------------------------------------
+    public void SetUpperLeft(Point point)
+    {
+        _upperLeft = point;
+    }
+    
+    public void SetUpperRight(Point point)
+    {
+        _upperRight = point;
+    }
+    
+    public void SetLowerLeft(Point point)
+    {
+        _lowerLeft = point;
+    }
+    
+    public void SetLowerRight (Point point)
+    {
+        _lowerRight = point;
+    }
+//-------------------------------------------------------
     public static Square FindAllCoordinates(Point upperLeft, Point lowerRight)
     {
         var xCenter = (upperLeft.X + lowerRight.X) / 2;
@@ -64,19 +104,8 @@ public class Square : Figure
         
         return Math.Abs(trianglesArea - squareArea) < epsilon;
     }
-    
-    public override void FinishDrawingFigure(PictureBox pictureBox)
-    {
-        Drawing.DrawPoint(pictureBox,_upperRight, Color.Black);
-        Drawing.DrawPoint(pictureBox,_lowerLeft, Color.Black);
 
-        Drawing.DrawLine(pictureBox, _upperLeft, _upperRight, Color.Black);
-        Drawing.DrawLine(pictureBox, _upperLeft, _lowerLeft, Color.Black);
-        Drawing.DrawLine(pictureBox, _upperRight, _lowerRight, Color.Black);
-        Drawing.DrawLine(pictureBox, _lowerLeft, _lowerRight, Color.Black);
-    }
-
-    public override void MoveFigure(PictureBox pictureBox, Point startPoint, Point finishPoint)
+    public void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
     {
         var deltaX1 = Math.Abs(_upperLeft.X - startPoint.X);
         var deltaY1 = Math.Abs(startPoint.Y - _upperLeft.Y);
@@ -93,23 +122,6 @@ public class Square : Figure
         var newSquare = FindAllCoordinates(_upperLeft, _lowerRight);
         _upperRight = newSquare._upperRight;
         _lowerLeft = newSquare._lowerLeft;
-        
-        Drawing.DrawPoint(pictureBox,_upperLeft,Color.Black);
-        Drawing.DrawPoint(pictureBox,_lowerRight,Color.Black);
-        FinishDrawingFigure(pictureBox);
-    }
-    
-    public override void PaintOverFigure(PictureBox pictureBox)
-    {
-        Drawing.DrawPoint(pictureBox,_upperLeft, Color.White);
-        Drawing.DrawPoint(pictureBox,_upperRight, Color.White);
-        Drawing.DrawPoint(pictureBox,_lowerRight, Color.White);
-        Drawing.DrawPoint(pictureBox,_lowerLeft, Color.White);
-        
-        Drawing.DrawLine(pictureBox, _upperLeft, _upperRight, Color.White);
-        Drawing.DrawLine(pictureBox, _upperLeft, _lowerLeft, Color.White);
-        Drawing.DrawLine(pictureBox, _upperRight, _lowerRight, Color.White);
-        Drawing.DrawLine(pictureBox, _lowerLeft, _lowerRight, Color.White);
     }
 
     public override string ToString()

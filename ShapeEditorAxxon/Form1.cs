@@ -1,4 +1,8 @@
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using System.Timers;
+using Microsoft.Win32;
+using Timer = System.Timers.Timer;
 
 namespace ShapeEditorAxxon;
 
@@ -11,6 +15,8 @@ public partial class Form1 : Form
     
     private Point _startLocation;
     private Point _finishLocation;
+
+    private Timer timer = new Timer();
 
     public Form1()
     {
@@ -39,10 +45,10 @@ public partial class Form1 : Form
         Drawing.DrawPoint(pictureBox1,secondPoint, Color.Black);
 
         var square = Square.FindAllCoordinates(firstPoint, secondPoint);
-        square.FinishDrawingFigure(pictureBox1);
-        square.WriteRichTextBox(richTextBox,square.ToString());
+        Drawing.DrawSquare(pictureBox1, square, Color.Black);
+        Writing.WriteRichTextBox(richTextBox,square.ToString());
         _figures.Add(square);
-
+        
         pictureBox1.MouseClick -= pictureBox1_MouseClick_Second;
     }
     
@@ -77,8 +83,8 @@ public partial class Form1 : Form
         thirdPoint = e.Location;
 
         var triangle = new Triangle(firstPoint, secondPoint, thirdPoint);
-        triangle.FinishDrawingFigure(pictureBox1);
-        triangle.WriteRichTextBox(richTextBox,triangle.ToString());
+        Drawing.DrawTriangle(pictureBox1, triangle, Color.Black);
+        Writing.WriteRichTextBox(richTextBox,triangle.ToString());
         _figures.Add(triangle);
 
         pictureBox1.MouseClick -= pictureBox1_MouseClick_ThirdTriangle;
@@ -106,8 +112,8 @@ public partial class Form1 : Form
         Drawing.DrawPoint(pictureBox1, firstPoint, Color.White);
 
         var circle = new Circle(firstPoint, secondPoint);
-        circle.FinishDrawingFigure(pictureBox1);
-        circle.WriteRichTextBox(richTextBox,circle.ToString());
+        Drawing.DrawCircle(pictureBox1,circle,Color.Black);
+        Writing.WriteRichTextBox(richTextBox,circle.ToString());
         _figures.Add(circle);
         
         pictureBox1.MouseClick -= pictureBox1_MouseClick_SecondCircle;
@@ -155,8 +161,8 @@ public partial class Form1 : Form
         fourthPoint = e.Location;
 
         var quadrangle = new Quadrangle(firstPoint, secondPoint, thirdPoint, fourthPoint);
-        quadrangle.FinishDrawingFigure(pictureBox1);
-        quadrangle.WriteRichTextBox(richTextBox,quadrangle.ToString());
+        Drawing.DrawQuadrangle(pictureBox1, quadrangle, Color.Black);
+        Writing.WriteRichTextBox(richTextBox,quadrangle.ToString());
         _figures.Add(quadrangle);
 
         pictureBox1.MouseClick -= pictureBox1_MouseClick_FourthQuadrangle;
@@ -235,11 +241,27 @@ public partial class Form1 : Form
     {
         if (_isDragging)
         {
-            _selectedFigure.PaintOverFigure(pictureBox1);
-            
             _finishLocation = e.Location;
-            _selectedFigure.MoveFigure(pictureBox1,_startLocation,_finishLocation);
-            _startLocation = _finishLocation;
+            
+            switch (_selectedFigure)
+            {
+                case Square square:
+                    Moving.MoveSquare(pictureBox1,_startLocation,_finishLocation, square);
+                    _startLocation = _finishLocation;
+                    break;
+                case Triangle triangle:
+                    Moving.MoveTriangle(pictureBox1, _startLocation, _finishLocation, triangle);
+                    _startLocation = _finishLocation;
+                    break;
+                case Circle circle:
+                    Moving.MoveCircle(pictureBox1, _startLocation, _finishLocation, circle);
+                    _startLocation = _finishLocation;
+                    break;
+                case Quadrangle quadrangle:
+                    Moving.MoveQuadrangle(pictureBox1, _startLocation, _finishLocation, quadrangle);
+                    _startLocation = _finishLocation;
+                    break;
+            }
         }
     }
 
@@ -250,5 +272,13 @@ public partial class Form1 : Form
             _isDragging = false;
             _selectedFigure = null;
         }
+    }
+
+    private void Timer_Elapsed(object? sender, ElapsedEventArgs elapsedEventArgs)
+    {
+        Writing.UpdateRichTextBox(_figures, richTextBox);
+
+        if (_selectedFigure == null)
+            Drawing.RedrawFigures(_figures, pictureBox1);
     }
 }

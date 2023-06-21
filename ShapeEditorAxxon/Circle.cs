@@ -60,30 +60,9 @@ public class Circle : Figure
         var distance = Mathematics.CalculateDistance(_center, point);
 
         return distance <= _radius;
-
     }
 
-    public void MoveFigure(PictureBox pictureBox, Point startPoint, Point finishPoint)
-    {
-        var start = FindStartPoint();
-        
-        var deltaX1 = startPoint.X - start.X;
-        var deltaY1 = startPoint.Y - start.Y;
-
-        var finishStart = new Point(finishPoint.X - deltaX1, finishPoint.Y - deltaY1);
-
-        _diameterFirst.X = finishStart.X;
-        _diameterFirst.Y = finishStart.Y + (int)_radius;
-
-        _diameterSecond.X = finishStart.X + 2 * (int)_radius;
-        _diameterSecond.Y = finishStart.Y + (int)_radius;
-
-        _center = FindCenterCoordinates();
-        
-        Drawing.DrawCircle(pictureBox,this, Color.Black);
-    }
-
-    public void FindCoordinatesfterMoving(Point startPoint, Point finishPoint)
+    public void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
     {
         var start = FindStartPoint();
         
@@ -100,6 +79,27 @@ public class Circle : Figure
 
         _center = FindCenterCoordinates();
     }
+    
+    public override bool ContainsPointOnNode(Point point)
+    {
+        var distance = Mathematics.CalculateDistance(_center, point);
+        return Math.Abs(distance - _radius) < 5;
+    }
+    
+    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    {
+        _diameterFirst = startPoint;
+        
+        double angle = Math.Atan2(_diameterFirst.Y - _center.Y, _diameterFirst.X - _center.X);
+        
+        _diameterSecond.X = (int)(_center.X + _radius * Math.Cos(angle + Math.PI));
+        _diameterSecond.Y = (int)(_center.Y + _radius * Math.Sin(angle + Math.PI));
+
+        _diameterFirst = finishPoint;
+        _center = FindCenterCoordinates();
+        _radius = FindRadiusLength();
+    }
+    
     public override string ToString()
     {
         var result = $"Circle:  " +

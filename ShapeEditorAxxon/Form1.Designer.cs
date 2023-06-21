@@ -235,6 +235,7 @@ partial class Form1
     private RichTextBox richTextBox;
     private TableLayoutPanel drawingTable;
     private TableLayoutPanel table;
+    private Timer timer;
 
     private Point firstPoint;
     private Point secondPoint;

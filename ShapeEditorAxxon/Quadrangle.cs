@@ -87,6 +87,62 @@ public class Quadrangle : Figure
         _thirdPoint = new Point(finishPoint.X + deltaX3, finishPoint.Y + deltaY3);
         _fourthPoint = new Point(finishPoint.X - deltaX4, finishPoint.Y + deltaY4);
     }
+    
+    public override bool ContainsPointOnNode(Point point)
+    {
+        var pointRadius = 5;
+
+        var distance1 = Mathematics.CalculateDistance(_firstPoint, point);
+        var distance2 = Mathematics.CalculateDistance(_secondPoint, point);
+        var distance3 = Mathematics.CalculateDistance(_thirdPoint, point);
+        var distance4 = Mathematics.CalculateDistance(_fourthPoint, point);
+
+        return distance1 <= pointRadius || distance2 <= pointRadius || distance3 <= pointRadius ||
+               distance4 <= pointRadius;
+    }
+
+    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    {
+        var pointRadius = 5;
+
+        var distance1 = Mathematics.CalculateDistance(_firstPoint, startPoint);
+        var distance2 = Mathematics.CalculateDistance(_secondPoint, startPoint);
+        var distance3 = Mathematics.CalculateDistance(_thirdPoint, startPoint);
+        var distance4 = Mathematics.CalculateDistance(_fourthPoint, startPoint);
+
+        if (distance1 <= pointRadius)
+        {
+            if (IsValidQuadrangle(finishPoint, _secondPoint, _thirdPoint, _fourthPoint))
+                _firstPoint = finishPoint;
+        }
+        else if (distance2 <= pointRadius)
+        {
+            if (IsValidQuadrangle(_firstPoint, finishPoint, _thirdPoint, _fourthPoint))
+                _secondPoint = finishPoint;
+        }
+        else if (distance3 <= pointRadius)
+        {
+            if(IsValidQuadrangle(_firstPoint,_secondPoint,finishPoint,_fourthPoint)) 
+                _thirdPoint = finishPoint;
+        }
+        else if (distance4 <= pointRadius)
+        {
+            if (IsValidQuadrangle(_firstPoint, _secondPoint, _thirdPoint, finishPoint))
+                _fourthPoint = finishPoint;
+        }
+    }
+
+    public static bool IsValidQuadrangle(Point a, Point b, Point c, Point d)
+    {
+        var abcAngle = Mathematics.CalculateAngle(a, b, c);
+        var bcdAngle = Mathematics.CalculateAngle(b, c, d);
+        var cdaAngle = Mathematics.CalculateAngle(c, d, a);
+        var dabAngle = Mathematics.CalculateAngle(d, a, b);
+
+        var quadrangleAngles = 360;
+
+        return Math.Abs((abcAngle + bcdAngle + cdaAngle + dabAngle) - quadrangleAngles) < double.Epsilon;
+    }
 
     public override string ToString()
     {

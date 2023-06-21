@@ -1,22 +1,18 @@
-using System.Reflection;
-
 namespace ShapeEditorAxxon;
 
-public class Drawing
+public static class Drawing
 {
     public static void DrawPoint(PictureBox pictureBox, Point point,Color color)
     {
         var gfx = pictureBox.CreateGraphics();
-        
         var solidBrush = new SolidBrush(color);
         
-        gfx.FillEllipse(solidBrush,point.X-3,point.Y-3,6,6);
+        gfx.FillEllipse(solidBrush,point.X-5,point.Y-5,10,10);
     }
 
     public static void DrawLine(PictureBox pictureBox, Point firstPoint, Point secondPoint, Color color)
     {
         var gfx = pictureBox.CreateGraphics();
-        
         var pen = new Pen(color,2);
         
         gfx.DrawLine(pen, firstPoint, secondPoint);
@@ -58,7 +54,6 @@ public class Drawing
     public static void DrawCircle(PictureBox pictureBox, Circle circle, Color color)
     {
         var gfx = pictureBox.CreateGraphics();
-
         var pen = new Pen(color, 2);
 
         var startPoint = circle.FindStartPoint();

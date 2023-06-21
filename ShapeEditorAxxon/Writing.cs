@@ -1,6 +1,6 @@
 namespace ShapeEditorAxxon;
 
-public class Writing
+public static class Writing
 {
     public static void WriteRichTextBox(RichTextBox richTextBox, string text) 
         => richTextBox.AppendText(text.Replace("  ",Environment.NewLine));

@@ -83,6 +83,31 @@ public class Triangle : Figure
         _thirdPoint.Y = finishPoint.Y - deltaY3;
     }
 
+    public override bool ContainsPointOnNode(Point point)
+    {
+        var pointRadius = 5;
+
+        var distance1 = Mathematics.CalculateDistance(_firstPoint, point);
+        var distance2 = Mathematics.CalculateDistance(_secondPoint, point);
+        var distance3 = Mathematics.CalculateDistance(_thirdPoint, point);
+
+        return distance1 <= pointRadius || distance2 <= pointRadius || distance3 <= pointRadius;
+    }
+
+    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    {
+        var pointRadius = 5;
+
+        var distance1 = Mathematics.CalculateDistance(_firstPoint, startPoint);
+        var distance2 = Mathematics.CalculateDistance(_secondPoint, startPoint);
+
+        if (distance1 <= pointRadius)
+            _firstPoint = finishPoint;
+        else if (distance2 <= pointRadius)
+            _secondPoint = finishPoint;
+        else _thirdPoint = finishPoint;
+    }
+    
     public override string ToString()
     {
         var result = $"Triangle:  " +

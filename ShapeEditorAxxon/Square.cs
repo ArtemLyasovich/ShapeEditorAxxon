@@ -13,8 +13,8 @@ public class Square : Figure
     private Point _lowerLeft;
     [DataMember] 
     private Point _lowerRight;
-
-    private Square(Point upperLeft, Point upperRight, Point lowerLeft, Point lowerRight)
+    
+    public Square(Point upperLeft, Point upperRight, Point lowerLeft, Point lowerRight)
     {
         _upperLeft = upperLeft;
         _upperRight = upperRight;
@@ -41,27 +41,7 @@ public class Square : Figure
     {
         return _lowerRight;
     }
-//---------------------------------------
-    public void SetUpperLeft(Point point)
-    {
-        _upperLeft = point;
-    }
-    
-    public void SetUpperRight(Point point)
-    {
-        _upperRight = point;
-    }
-    
-    public void SetLowerLeft(Point point)
-    {
-        _lowerLeft = point;
-    }
-    
-    public void SetLowerRight (Point point)
-    {
-        _lowerRight = point;
-    }
-//-------------------------------------------------------
+
     public static Square FindAllCoordinates(Point upperLeft, Point lowerRight)
     {
         var xCenter = (upperLeft.X + lowerRight.X) / 2;
@@ -70,8 +50,8 @@ public class Square : Figure
         var xVector = lowerRight.X - upperLeft.X;
         var yVector = lowerRight.Y - upperLeft.Y;
 
-        var xPerpendicular = -yVector/2;//Here;
-        var yPerpendicular = xVector/2;//Here
+        var xPerpendicular = -yVector / 2; //Here;
+        var yPerpendicular = xVector/2; //Here
 
         var upperRight = new Point(xCenter - xPerpendicular, yCenter - yPerpendicular);
         var lowerLeft = new Point(xCenter + xPerpendicular, yCenter + yPerpendicular);
@@ -124,6 +104,64 @@ public class Square : Figure
         _lowerLeft = newSquare._lowerLeft;
     }
 
+    public override bool ContainsPointOnNode(Point point)
+    {
+        var pointRadius = 5;
+
+        var distance1 = Mathematics.CalculateDistance(_upperLeft, point);
+        var distance2 = Mathematics.CalculateDistance(_upperRight, point);
+        var distance3 = Mathematics.CalculateDistance(_lowerLeft, point);
+        var distance4 = Mathematics.CalculateDistance(_upperLeft, point);
+
+        return distance1 <= pointRadius || distance2 <= pointRadius || distance3 <= pointRadius ||
+               distance4 <= pointRadius;
+    }
+
+    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    {
+        var pointRadius = 5;
+
+        var distance1 = Mathematics.CalculateDistance(_upperLeft, startPoint);
+        var distance2 = Mathematics.CalculateDistance(_upperRight, startPoint);
+        var distance3 = Mathematics.CalculateDistance(_lowerLeft, startPoint);
+
+        if (distance1 <= pointRadius)
+        {
+            _upperLeft = finishPoint;
+
+            var tempSquare = FindAllCoordinates(_upperLeft, _lowerRight);
+
+            _upperRight = tempSquare._upperRight;
+            _lowerLeft = tempSquare._lowerLeft;
+        }
+        else if (distance2 <= pointRadius)
+        {
+            _upperRight = finishPoint;
+
+            var tempSquare = FindAllCoordinates(_upperRight, _lowerLeft);
+
+            _upperLeft = tempSquare._upperLeft;
+            _lowerRight = tempSquare._lowerRight;
+        }
+        else if (distance3 <= pointRadius)
+        {
+            _lowerLeft = finishPoint;
+
+            var tempSquare = FindAllCoordinates(_upperRight, _lowerLeft);
+
+            _upperLeft = tempSquare._upperLeft;
+            _lowerRight = tempSquare._lowerRight;
+        }
+        else
+        {
+            _lowerRight = finishPoint;
+
+            var tempSquare = FindAllCoordinates(_upperLeft, _lowerRight);
+
+            _upperRight = tempSquare._upperRight;
+            _lowerLeft = tempSquare._lowerLeft;
+        }
+    }
     public override string ToString()
     {
         var result = $"Square:  " +

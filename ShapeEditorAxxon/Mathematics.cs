@@ -1,6 +1,6 @@
 namespace ShapeEditorAxxon;
 
-public class Mathematics
+public static class Mathematics
 {
     public static double CalculateDistance(Point point1, Point point2)
     {
@@ -10,5 +10,26 @@ public class Mathematics
         double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
 
         return distance;
+    }
+
+    private static double RadiansToDegrees(double radians)
+    {
+        return radians * (180 / Math.PI);
+    }
+    
+    public static double CalculateAngle(Point a, Point b, Point c)
+    {
+        var ab = new Point(b.X - a.X, b.Y - a.Y);
+        var bc = new Point(c.X - b.X, c.Y - b.Y);
+        
+        var dotProduct = ab.X * bc.X + ab.Y * bc.Y;
+
+        var AbVectorLength = Math.Sqrt(ab.X * ab.X + ab.Y * ab.Y);
+        var BcVectorLength = Math.Sqrt(bc.X * bc.X + bc.Y * bc.Y);
+
+        var angle = Math.Acos(dotProduct / (AbVectorLength * BcVectorLength));
+        var degrees = RadiansToDegrees(angle);
+
+        return degrees;
     }
 }

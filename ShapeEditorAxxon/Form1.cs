@@ -1,22 +1,17 @@
-using System.Runtime.InteropServices;
-using Newtonsoft.Json;
 using System.Timers;
-using Microsoft.Win32;
-using Timer = System.Timers.Timer;
 
 namespace ShapeEditorAxxon;
 
 public partial class Form1 : Form
 {
     private List<Figure> _figures = new List<Figure>();
-    
+
     private Figure _selectedFigure;
     private bool _isDragging;
+    private bool _isFigureChanging;
     
     private Point _startLocation;
     private Point _finishLocation;
-
-    private Timer timer = new Timer();
 
     public Form1()
     {
@@ -41,8 +36,6 @@ public partial class Form1 : Form
     private void pictureBox1_MouseClick_Second(object sender, MouseEventArgs e)
     {
         secondPoint = e.Location;
-        
-        Drawing.DrawPoint(pictureBox1,secondPoint, Color.Black);
 
         var square = Square.FindAllCoordinates(firstPoint, secondPoint);
         Drawing.DrawSquare(pictureBox1, square, Color.Black);
@@ -148,7 +141,7 @@ public partial class Form1 : Form
     private void pictureBox1_MouseClick_ThirdQuadrangle(object sender, MouseEventArgs e)
     {
         thirdPoint = e.Location;
-        
+
         Drawing.DrawPoint(pictureBox1, thirdPoint, Color.Black);
         Drawing.DrawLine(pictureBox1, secondPoint, thirdPoint, Color.Black);
         
@@ -160,62 +153,55 @@ public partial class Form1 : Form
     {
         fourthPoint = e.Location;
 
-        var quadrangle = new Quadrangle(firstPoint, secondPoint, thirdPoint, fourthPoint);
-        Drawing.DrawQuadrangle(pictureBox1, quadrangle, Color.Black);
-        Writing.WriteRichTextBox(richTextBox,quadrangle.ToString());
-        _figures.Add(quadrangle);
+        if (Quadrangle.IsValidQuadrangle(firstPoint, secondPoint, thirdPoint, fourthPoint))
+        {
+            var quadrangle = new Quadrangle(firstPoint, secondPoint, thirdPoint, fourthPoint);
+            Drawing.DrawQuadrangle(pictureBox1, quadrangle, Color.Black);
+            Writing.WriteRichTextBox(richTextBox, quadrangle.ToString());
+            _figures.Add(quadrangle);
 
-        pictureBox1.MouseClick -= pictureBox1_MouseClick_FourthQuadrangle;
+            pictureBox1.MouseClick -= pictureBox1_MouseClick_FourthQuadrangle;
+        }
+        else
+            MessageBox.Show(@"Put the correct point");
     }
 
     private void saveButton_Click(object sender, EventArgs e)
     {
-        var saveFileDialog = new SaveFileDialog();
-    
-        saveFileDialog.FileName = "figures";
-        saveFileDialog.DefaultExt = ".json";
-    
-        var result = saveFileDialog.ShowDialog();
-        if (result == DialogResult.OK)
+        var folderBrowserDialog = new FolderBrowserDialog();
+
+        var result = folderBrowserDialog.ShowDialog();
+        if( result == DialogResult.OK )
         {
-            var filePath = saveFileDialog.FileName;
+            var folderPath = folderBrowserDialog.SelectedPath;
             
-            var jsonData = JsonConvert.SerializeObject(_figures);
+            var directoryName = "Figures";
+            var fullPath = Path.Combine(folderPath, directoryName);
+            var directoryInfo = Directory.CreateDirectory(fullPath);
+
+            var directoryPath = directoryInfo.FullName;
             
-            File.WriteAllText(filePath, jsonData);
-        
-            MessageBox.Show(@"The data was successfully saved.");
+            FigureConverter.SerializeFigures(directoryPath, _figures);
+            
+            MessageBox.Show(@"The data was successfully saved");
         }
     }
 
     private void loadButton_Click(object sender, EventArgs e)
     {
-        var openFileDialog = new OpenFileDialog();
+        var folderBrowserDialog = new FolderBrowserDialog();
 
-        openFileDialog.Filter = "JSON Files (*.json)|*.json";
-        openFileDialog.DefaultExt = "json";
-
-        var result = openFileDialog.ShowDialog();
+        var result = folderBrowserDialog.ShowDialog();
         if (result == DialogResult.OK)
         {
-            var filePath = openFileDialog.FileName;
-
-            if (File.Exists(filePath))
+            var folderPath = folderBrowserDialog.SelectedPath;
+            try
             {
-                var jsonData = File.ReadAllText(filePath);
-
-                try
-                {
-                    _figures = JsonConvert.DeserializeObject<List<Figure>>(jsonData);
-                }
-                catch (Exception exception)
-                {
-                    MessageBox.Show(exception.Message);
-                }
+                _figures = FigureConverter.DeserializeFigures(folderPath);
             }
-            else
+            catch (Exception exception)
             {
-                MessageBox.Show(@"The file you selected doesn't exist.");
+                MessageBox.Show(exception.ToString());
             }
         }
     }
@@ -226,6 +212,19 @@ public partial class Form1 : Form
 
         for (var i = _figures.Count - 1; i >= 0; i--)
         {
+            var figure = _figures[i] as Figure;
+            if(figure.ContainsPointOnNode(point))
+            {
+                _selectedFigure = figure;
+                _isFigureChanging = true;
+                _startLocation = point;
+                return;
+            }
+        }
+
+        for (var i = _figures.Count - 1; i >= 0; i--)
+        {
+
             if (_figures[i].ContainsPoint(point))
             {
                 _selectedFigure = _figures[i];
@@ -239,6 +238,31 @@ public partial class Form1 : Form
 
     private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
     {
+        if (_isFigureChanging)
+        {
+            _finishLocation = e.Location;
+
+            switch (_selectedFigure)
+            {
+                case Square square:
+                    Moving.MoveSquareNode(pictureBox1,_startLocation,_finishLocation, square);
+                    _startLocation = _finishLocation;
+                    break;
+                case Triangle triangle:
+                    Moving.MoveTriangleNode(pictureBox1, _startLocation, _finishLocation, triangle);
+                    _startLocation = _finishLocation;
+                    break;
+                case Circle circle:
+                    Moving.MoveCircleNode(pictureBox1, _startLocation, _finishLocation, circle);
+                    _startLocation = _finishLocation;
+                    break;
+                case Quadrangle quadrangle:
+                    Moving.MoveQuadrangleNode(pictureBox1, _startLocation, _finishLocation, quadrangle);
+                    _startLocation = _finishLocation;
+                    break;
+            }
+        }
+        
         if (_isDragging)
         {
             _finishLocation = e.Location;
@@ -267,6 +291,11 @@ public partial class Form1 : Form
 
     private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
     {
+        if (_isFigureChanging)
+        {
+            _isFigureChanging = false;
+            _selectedFigure = null;
+        }
         if (_isDragging)
         {
             _isDragging = false;

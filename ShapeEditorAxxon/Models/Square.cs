@@ -140,8 +140,8 @@ public class Square : Figure
 
             var tempSquare = FindAllCoordinates(_upperRight, _lowerLeft);
 
-            _upperLeft = tempSquare._upperLeft;
-            _lowerRight = tempSquare._lowerRight;
+            _upperLeft = tempSquare._upperRight;
+            _lowerRight = tempSquare._lowerLeft;
         }
         else if (distance3 <= pointRadius)
         {
@@ -149,8 +149,8 @@ public class Square : Figure
 
             var tempSquare = FindAllCoordinates(_upperRight, _lowerLeft);
 
-            _upperLeft = tempSquare._upperLeft;
-            _lowerRight = tempSquare._lowerRight;
+            _upperLeft = tempSquare._upperRight;
+            _lowerRight = tempSquare._lowerLeft;
         }
         else
         {

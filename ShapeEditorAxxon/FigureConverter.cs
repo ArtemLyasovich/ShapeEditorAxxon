@@ -1,62 +1,118 @@
-using Newtonsoft.Json;
+using System.Reflection;
+using System.Text.Json;
 
 namespace ShapeEditorAxxon;
 
 public static class FigureConverter
 {
-    public static void SerializeFigures(string directoryPath, List<Figure> figures)
+    public static void SerializeFigures(string filePath, List<Figure> figures)
     {
-        if (figures.Any())
+        var jsonOptions = new JsonSerializerOptions
         {
-            var squares = figures.Where(p => p is Square);
-            var triangles = figures.Where(p => p is Triangle);
-            var circles = figures.Where(p => p is Circle);
-            var quadrangles = figures.Where(p => p is Quadrangle);
+            WriteIndented = true
+        };
 
-            var filePath = Path.Combine(directoryPath, "squares.json");
-            WriteFile(filePath, squares);
-            
-            filePath = Path.Combine(directoryPath, "triangles.json");
-            WriteFile(filePath, triangles);
+        var jsonData = new List<Dictionary<string, object>>();
+        foreach (var figure in figures)
+        {
+            var figureData = new Dictionary<string, object>
+            {
+                { "type", figure.GetType().Name },
+                { "data", SerializeFigureData(figure) }
+            };
+            jsonData.Add(figureData);
+        }
 
-            filePath = Path.Combine(directoryPath, "circles.json");
-            WriteFile(filePath, circles);
+        var jsonString = JsonSerializer.Serialize(jsonData, jsonOptions);
+        File.WriteAllText(filePath, jsonString);
+    }
 
-            filePath = Path.Combine(directoryPath, "quadrangles.json");
-            WriteFile(filePath, quadrangles);
+    private static Dictionary<string, object> SerializeFigureData(Figure figure)
+    {
+        var figureData = new Dictionary<string, object>();
+
+        var type = figure.GetType();
+        var fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
+        foreach (var field in fields)
+        {
+            var fieldName = field.Name;
+            var fieldValue = field.GetValue(figure);
+            figureData[fieldName] = fieldValue;
+        }
+
+        return figureData;
+    }
+    
+    public static List<Figure> DeserializeFigures(string filePath)
+    {
+        var jsonString = File.ReadAllText(filePath);
+        var jsonData = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(jsonString);
+
+        var figures = new List<Figure>();
+        foreach (var figureData in jsonData)
+        {
+            if (figureData.TryGetValue("type", out var figureTypeValue) && figureTypeValue is JsonElement typeElement && typeElement.ValueKind == JsonValueKind.String)
+            {
+                var figureType = Type.GetType($"ShapeEditorAxxon.{typeElement.GetString()}");
+                if (figureType != null)
+                {
+                    var figure = (Figure)Activator.CreateInstance(figureType);
+                    DeserializeFigureData(figure, figureData["data"]);
+                    figures.Add(figure);
+                }
+            }
+        }
+
+        return figures;
+    }
+
+    private static void DeserializeFigureData(Figure figure, object data)
+    {
+        if (data is JsonElement jsonData)
+        {
+            var type = figure.GetType();
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
+            foreach (var field in fields)
+            {
+                var fieldName = field.Name;
+                if (jsonData.TryGetProperty(fieldName, out var jsonValue))
+                {
+                    var fieldValue = ConvertJsonValue(jsonValue, field.FieldType);
+                    field.SetValue(figure, fieldValue);
+                }
+            }
+        }
+        else
+        {
+            MessageBox.Show($"Object is of type {data.GetType()}, expected JsonElement");
         }
     }
 
-    public static List<Figure> DeserializeFigures(string directoryPath)
+    private static object ConvertJsonValue(JsonElement jsonValue, Type targetType)
     {
-        var filePath = Path.Combine(directoryPath, "squares.json");
-        var jsonData = File.ReadAllText(filePath);
-
-        var squares = JsonConvert.DeserializeObject<List<Square>>(jsonData);
+        if (targetType == typeof(double))
+        {
+            return jsonValue.GetDouble();
+        }
+        if (targetType == typeof(Point))
+        {
+            return ConvertJsonToPoint(jsonValue);
+        }
         
-        filePath = Path.Combine(directoryPath, "triangles.json");
-        jsonData = File.ReadAllText(filePath);
-            
-        var triangles = JsonConvert.DeserializeObject<List<Triangle>>(jsonData);
-        
-        filePath = Path.Combine(directoryPath, "circles.json");
-        jsonData = File.ReadAllText(filePath);
-            
-        var circles = JsonConvert.DeserializeObject<List<Circle>>(jsonData);
-        
-        filePath = Path.Combine(directoryPath, "quadrangles.json");
-        jsonData = File.ReadAllText(filePath);
-            
-        var quadrangles = JsonConvert.DeserializeObject<List<Quadrangle>>(jsonData);
-        
-        var figures = squares.Concat<Figure>(triangles).Concat<Figure>(circles).Concat(quadrangles);
-        
-        return new List<Figure>(figures);
+        return null;
     }
 
-    private static void WriteFile(string filePath, IEnumerable<Figure> figures)
+    private static Point ConvertJsonToPoint(JsonElement jsonValue)
     {
-        var jsonData = JsonConvert.SerializeObject(figures);
-        File.WriteAllText(filePath, jsonData);
+        if (jsonValue.ValueKind == JsonValueKind.Object)
+        {
+            var x = jsonValue.GetProperty("X").GetInt32();
+            var y = jsonValue.GetProperty("Y").GetInt32();
+            return new Point(x, y);
+        }
+        
+        return Point.Empty;
     }
 }

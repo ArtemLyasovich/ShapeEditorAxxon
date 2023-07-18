@@ -1,18 +1,20 @@
-﻿using System.Runtime.Serialization;
+﻿namespace ShapeEditorAxxon;
 
-namespace ShapeEditorAxxon;
-
-[DataContract]
 public class Circle : Figure
 {
-    [DataMember]
     private Point _diameterFirst;
-    [DataMember]
     private Point _diameterSecond;
-    [DataMember]
     private Point _center;
-    [DataMember]
     private double _radius;
+
+    public Circle()
+    {
+        
+    }
+
+    public Point Center => _center;
+
+    public double Radius => _radius;
 
     public Circle(Point diameterFirst, Point diameterSecond)
     {
@@ -20,6 +22,11 @@ public class Circle : Figure
         _diameterSecond = diameterSecond;
         _center = FindCenterCoordinates();
         _radius = FindRadiusLength();
+    }
+
+    public override List<Point> GetPoints()
+    {
+        return new List<Point>();
     }
 
     private Point FindCenterCoordinates()
@@ -62,7 +69,7 @@ public class Circle : Figure
         return distance <= _radius;
     }
 
-    public void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
     {
         var start = FindStartPoint();
         
@@ -86,7 +93,7 @@ public class Circle : Figure
         return Math.Abs(distance - _radius) < 5;
     }
     
-    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
     {
         _diameterFirst = startPoint;
         
@@ -96,6 +103,15 @@ public class Circle : Figure
         _diameterSecond.Y = (int)(_center.Y + _radius * Math.Sin(angle + Math.PI));
 
         _diameterFirst = finishPoint;
+        _center = FindCenterCoordinates();
+        _radius = FindRadiusLength();
+    }
+    
+    public override void ScalingCoordinates(float scaleX, float scaleY)
+    {
+        _diameterFirst = new Point((int)(_diameterFirst.X * scaleX), (int)(_diameterFirst.Y * scaleY));
+        _diameterSecond = new Point((int)(_diameterSecond.X * scaleX), (int)(_diameterSecond.Y * scaleY));
+
         _center = FindCenterCoordinates();
         _radius = FindRadiusLength();
     }

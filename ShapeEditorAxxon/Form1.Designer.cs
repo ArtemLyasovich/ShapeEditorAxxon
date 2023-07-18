@@ -21,7 +21,8 @@ partial class Form1
     {
         saveButton = new Button();
         loadButton = new Button();
-        textBox = new TextBox();
+        stopDrawingButton = new Button();
+        clearButton = new Button();
         saveLoadTable = new TableLayoutPanel();
         squareButton = new Button();
         triangleButton = new Button();
@@ -29,10 +30,13 @@ partial class Form1
         quadrangleButton = new Button();
         figureTable = new TableLayoutPanel();
         richTextBox = new RichTextBox();
-        pictureBox1 = new PictureBox();
+        pictureBox1 = new DoubleBufferedPictureBox();
         drawingTable = new TableLayoutPanel();
         table = new TableLayoutPanel();
         timer = new Timer();
+        timer2 = new Timer();
+        formWidth = 1200;
+        formHeight = 800;
         saveLoadTable.SuspendLayout();
         figureTable.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -40,11 +44,17 @@ partial class Form1
         table.SuspendLayout();
         SuspendLayout();
         //
-        // Timer
+        // RichTextBoxTimer
         // 
         timer.Interval = 1000;
         timer.Elapsed += Timer_Elapsed;
         timer.Start();
+        //
+        // PictureBoxTimerTimer
+        // 
+        timer2.Interval = 50;
+        timer2.Elapsed += Timer2_Elapsed;
+        timer2.Start();
         //
         // saveButton
         // 
@@ -68,25 +78,38 @@ partial class Form1
         loadButton.BackColor = Color.White;
         loadButton.Click += loadButton_Click;
         // 
-        // textBox
+        // stopDrawingButton
         // 
-        textBox.Dock = DockStyle.Fill;
-        textBox.Location = new Point(589, 3);
-        textBox.Name = "textBox";
-        textBox.ReadOnly = true;
-        textBox.Size = new Size(580, 31);
-        textBox.TabIndex = 2;
-        textBox.Text = "Made by Artem Lyasovich";
-        textBox.TextAlign = HorizontalAlignment.Center;
+        stopDrawingButton.Dock = DockStyle.Fill;
+        stopDrawingButton.Location = new Point(589, 3);
+        stopDrawingButton.Name = "stopDrawingButton";
+        stopDrawingButton.Size = new Size(287, 40);
+        stopDrawingButton.TabIndex = 1;
+        stopDrawingButton.Text = "Stop Drawing";
+        stopDrawingButton.BackColor = Color.White;
+        stopDrawingButton.Click += stopDrawingButton_Click;
+        // 
+        // clearButton
+        // 
+        clearButton.Dock = DockStyle.Fill;
+        clearButton.Location = new Point(882, 3);
+        clearButton.Name = "clearButton";
+        clearButton.Size = new Size(287, 40);
+        clearButton.TabIndex = 1;
+        clearButton.Text = "Clear";
+        clearButton.BackColor = Color.White;
+        clearButton.Click += clearButton_Click;
         // 
         // saveLoadTable
         // 
         saveLoadTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
         saveLoadTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-        saveLoadTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+        saveLoadTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+        saveLoadTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
         saveLoadTable.Controls.Add(saveButton, 0, 0);
         saveLoadTable.Controls.Add(loadButton, 1, 0);
-        saveLoadTable.Controls.Add(textBox, 2, 0);
+        saveLoadTable.Controls.Add(stopDrawingButton, 2, 0);
+        saveLoadTable.Controls.Add(clearButton, 3, 0);
         saveLoadTable.Dock = DockStyle.Fill;
         saveLoadTable.Location = new Point(3, 3);
         saveLoadTable.Name = "saveLoadTable";
@@ -213,6 +236,7 @@ partial class Form1
         Name = "Form1";
         BackColor = Color.Gray;
         Text = "Shape editor";
+        Resize += Form_Resize;
         saveLoadTable.ResumeLayout(false);
         saveLoadTable.PerformLayout();
         figureTable.ResumeLayout(false);
@@ -222,11 +246,12 @@ partial class Form1
         ResumeLayout(false);
     }
 
-    private PictureBox pictureBox1;
+    private DoubleBufferedPictureBox pictureBox1;
     private Button squareButton;
     private Button saveButton;
     private Button loadButton;
-    private TextBox textBox;
+    private Button stopDrawingButton;
+    private Button clearButton;
     private TableLayoutPanel saveLoadTable;
     private Button triangleButton;
     private Button circleButton;
@@ -236,12 +261,13 @@ partial class Form1
     private TableLayoutPanel drawingTable;
     private TableLayoutPanel table;
     private Timer timer;
+    private Timer timer2;
 
     private Point firstPoint;
     private Point secondPoint;
     private Point thirdPoint;
     private Point fourthPoint;
-    /// <summary>
-    /// 
-    /// </summary>
+
+    private int formWidth;
+    private int formHeight;
 }

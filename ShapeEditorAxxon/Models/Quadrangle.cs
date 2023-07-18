@@ -1,18 +1,16 @@
-﻿using System.Runtime.Serialization;
+﻿namespace ShapeEditorAxxon;
 
-namespace ShapeEditorAxxon;
-
-[DataContract]
 public class Quadrangle : Figure
 {
-    [DataMember]
     private Point _firstPoint;
-    [DataMember]
     private Point _secondPoint;
-    [DataMember]
     private Point _thirdPoint;
-    [DataMember]
     private Point _fourthPoint;
+
+    public Quadrangle()
+    {
+        
+    }
 
     public Quadrangle(Point firstPoint, Point secondPoint, Point thirdPoint, Point fourthPoint)
     {
@@ -21,27 +19,15 @@ public class Quadrangle : Figure
         _thirdPoint = thirdPoint;
         _fourthPoint = fourthPoint;
     }
-    
-    public Point GetFirstPoint()
+
+    public override List<Point> GetPoints()
     {
-        return _firstPoint;
+        return new List<Point>()
+        {
+            _firstPoint, _secondPoint, _thirdPoint, _fourthPoint
+        };
     }
 
-    public Point GetSecondPoint()
-    {
-        return _secondPoint;
-    }
-
-    public Point GetThirdPoint()
-    {
-        return _thirdPoint;
-    }
-
-    public Point GetFourthPoint()
-    {
-        return _fourthPoint;
-    }
-    
     public override double CalculateArea()
     {
         var firstTriangle = new Triangle(_firstPoint, _secondPoint, _thirdPoint);
@@ -68,7 +54,7 @@ public class Quadrangle : Figure
         return Math.Abs(trianglesArea - quadrangleArea) < epsilon;
     }
 
-    public void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
     {
         var deltaX1 = startPoint.X - _firstPoint.X;
         var deltaY1 = startPoint.Y - _firstPoint.Y;
@@ -101,7 +87,7 @@ public class Quadrangle : Figure
                distance4 <= pointRadius;
     }
 
-    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
     {
         var pointRadius = 5;
 
@@ -142,6 +128,14 @@ public class Quadrangle : Figure
         var quadrangleAngles = 360;
 
         return Math.Abs((abcAngle + bcdAngle + cdaAngle + dabAngle) - quadrangleAngles) < double.Epsilon;
+    }
+    
+    public override void ScalingCoordinates(float scaleX, float scaleY)
+    {
+        _firstPoint = new Point((int)(_firstPoint.X * scaleX), (int)(_firstPoint.Y * scaleY));
+        _secondPoint = new Point((int)(_secondPoint.X * scaleX), (int)(_secondPoint.Y * scaleY));
+        _thirdPoint = new Point((int)(_thirdPoint.X * scaleX), (int)(_thirdPoint.Y * scaleY));
+        _fourthPoint = new Point((int)(_fourthPoint.X * scaleX), (int)(_fourthPoint.Y * scaleY));
     }
 
     public override string ToString()

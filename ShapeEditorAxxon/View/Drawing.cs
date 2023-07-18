@@ -1,124 +1,76 @@
-namespace ShapeEditorAxxon;
+namespace ShapeEditorAxxon.View;
 
 public static class Drawing
 {
-    public static void DrawPoint(PictureBox pictureBox, Point point,Color color)
+    public static void DrawPoint(DoubleBufferedPictureBox pictureBox, Point point, Color color)
     {
         var gfx = pictureBox.CreateGraphics();
         var solidBrush = new SolidBrush(color);
-        
-        gfx.FillEllipse(solidBrush,point.X-5,point.Y-5,10,10);
+
+        gfx.FillEllipse(solidBrush, point.X - 5, point.Y - 5, 10, 10);
     }
 
-    public static void DrawLine(PictureBox pictureBox, Point firstPoint, Point secondPoint, Color color)
+    public static void DrawLine(DoubleBufferedPictureBox pictureBox, Point startPoint, Point endPoint, Color color)
     {
         var gfx = pictureBox.CreateGraphics();
-        var pen = new Pen(color,2);
-        
-        gfx.DrawLine(pen, firstPoint, secondPoint);
+        var pen = new Pen(color, 2);
+
+        gfx.DrawLine(pen, startPoint, endPoint);
     }
 
-    public static void DrawSquare(PictureBox pictureBox, Square square, Color color)
+    private static void DrawPoints(DoubleBufferedPictureBox pictureBox, List<Point> points, Color color)
     {
-        var upperLeft = square.GetUpperLeft();
-        var upperRight = square.GetUpperRight();
-        var lowerLeft = square.GetLowerLeft();
-        var lowerRight = square.GetLowerRight();
-        
-        DrawPoint(pictureBox, upperLeft, color);
-        DrawPoint(pictureBox, upperRight, color);
-        DrawPoint(pictureBox,lowerRight, color);
-        DrawPoint(pictureBox,lowerLeft, color);
-        
-        DrawLine(pictureBox, upperLeft, upperRight, color);
-        DrawLine(pictureBox, upperLeft, lowerLeft, color);
-        DrawLine(pictureBox, upperRight, lowerRight, color);
-        DrawLine(pictureBox, lowerLeft, lowerRight, color);
+        foreach (var point in points)
+            DrawPoint(pictureBox, point, color);
     }
 
-    public static void DrawTriangle(PictureBox pictureBox, Triangle triangle, Color color)
+    private static void DrawLines(DoubleBufferedPictureBox pictureBox, List<Point> points, Color color)
     {
-        var firstPoint = triangle.GetFirstPoint();
-        var secondPoint = triangle.GetSecondPoint();
-        var thirdPoint = triangle.GetThirdPoint();
-        
-        DrawPoint(pictureBox, firstPoint, color);
-        DrawPoint(pictureBox, secondPoint, color);
-        DrawPoint(pictureBox, thirdPoint, color);
+        var gfx = pictureBox.CreateGraphics();
+        var pen = new Pen(color, 2);
 
-        DrawLine(pictureBox, firstPoint, secondPoint, color);
-        DrawLine(pictureBox, secondPoint, thirdPoint, color);
-        DrawLine(pictureBox, thirdPoint, firstPoint, color);
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            gfx.DrawLine(pen, points[i], points[i + 1]);
+        }
+
+        gfx.DrawLine(pen, points[^1], points[0]);
     }
-
-    public static void DrawCircle(PictureBox pictureBox, Circle circle, Color color)
+    
+    private static void DrawCircle(DoubleBufferedPictureBox pictureBox, Circle circle, Color color)
     {
         var gfx = pictureBox.CreateGraphics();
         var pen = new Pen(color, 2);
 
         var startPoint = circle.FindStartPoint();
         var diameterLength = circle.FindDiameterLength();
-        
-        gfx.DrawEllipse(pen, startPoint.X,startPoint.Y,(float)diameterLength,(float)diameterLength);
-    }
 
-    public static void DrawQuadrangle(PictureBox pictureBox, Quadrangle quadrangle, Color color)
+        gfx.DrawEllipse(pen, startPoint.X, startPoint.Y, (float)diameterLength, (float)diameterLength);
+    }
+    
+    public static void DrawFigure(DoubleBufferedPictureBox pictureBox, Figure figure, Color color)
     {
-        var firstPoint = quadrangle.GetFirstPoint();
-        var secondPoint = quadrangle.GetSecondPoint();
-        var thirdPoint = quadrangle.GetThirdPoint();
-        var fourthPoint = quadrangle.GetFourthPoint();
-        
-        DrawPoint(pictureBox, firstPoint, color);
-        DrawPoint(pictureBox, secondPoint, color);
-        DrawPoint(pictureBox, thirdPoint, color);
-        DrawPoint(pictureBox, fourthPoint, color);
-
-        DrawLine(pictureBox, firstPoint, secondPoint, color);
-        DrawLine(pictureBox, secondPoint, thirdPoint, color);
-        DrawLine(pictureBox, thirdPoint, fourthPoint, color);
-        DrawLine(pictureBox, fourthPoint, firstPoint, color);
+        if (figure is Circle circle)
+            DrawCircle(pictureBox, circle, color);
+        else
+        {
+            var points = figure.GetPoints();
+            DrawPoints(pictureBox, points, color);
+            DrawLines(pictureBox, points, color);
+        }
     }
 
-    public static void PaintOverSquare(PictureBox pictureBox, Figure figure)
+    public static void PaintOverFigure(DoubleBufferedPictureBox pictureBox, Figure figure)
     {
-        DrawSquare(pictureBox, (Square)figure, Color.White);
+        if (figure is Circle circle)
+            DrawCircle(pictureBox, circle, Color.White);
+        else
+            DrawFigure(pictureBox, figure, Color.White);
     }
 
-    public static void PaintOverTriangle(PictureBox pictureBox, Figure figure)
-    {
-        DrawTriangle(pictureBox, (Triangle)figure, Color.White);
-    }
-
-    public static void PaintOverCircle(PictureBox pictureBox, Figure figure)
-    {
-        DrawCircle(pictureBox, (Circle)figure, Color.White);
-    }
-
-    public static void PaintOverQuadrangle(PictureBox pictureBox, Figure figure)
-    {
-        DrawQuadrangle(pictureBox, (Quadrangle)figure, Color.White);
-    }
-
-    public static void RedrawFigures(List<Figure> figures, PictureBox pictureBox)
+    public static void RedrawFigures(List<Figure> figures, DoubleBufferedPictureBox pictureBox)
     {
         foreach (var figure in figures)
-        {
-            switch (figure)
-            {
-                case Square square:
-                    DrawSquare(pictureBox, square, Color.Black);
-                    break;
-                case Triangle triangle:
-                    DrawTriangle(pictureBox, triangle, Color.Black);
-                    break;
-                case Circle circle:
-                    DrawCircle(pictureBox, circle, Color.Black);
-                    break;
-                case Quadrangle quadrangle:
-                    DrawQuadrangle(pictureBox, quadrangle, Color.Black);
-                    break;
-            }
-        }
+            DrawFigure(pictureBox, figure, Color.Black);
     }
 }

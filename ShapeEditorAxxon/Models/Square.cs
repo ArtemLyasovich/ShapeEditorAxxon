@@ -1,19 +1,17 @@
-﻿using System.Runtime.Serialization;
+﻿namespace ShapeEditorAxxon;
 
-namespace ShapeEditorAxxon;
-
-[DataContract]
 public class Square : Figure
 {
-    [DataMember] 
     private Point _upperLeft;
-    [DataMember] 
     private Point _upperRight;
-    [DataMember] 
     private Point _lowerLeft;
-    [DataMember] 
     private Point _lowerRight;
-    
+
+    public Square()
+    {
+        
+    }
+
     public Square(Point upperLeft, Point upperRight, Point lowerLeft, Point lowerRight)
     {
         _upperLeft = upperLeft;
@@ -22,24 +20,12 @@ public class Square : Figure
         _lowerRight = lowerRight;
     }
 
-    public Point GetUpperLeft()
+    public override List<Point> GetPoints()
     {
-        return _upperLeft;
-    }
-    
-    public Point GetUpperRight()
-    {
-        return _upperRight;
-    }
-    
-    public Point GetLowerLeft()
-    {
-        return _lowerLeft;
-    }
-    
-    public Point GetLowerRight()
-    {
-        return _lowerRight;
+        return new List<Point>()
+        {
+            _upperLeft,_upperRight,_lowerRight,_lowerLeft
+        };
     }
 
     public static Square FindAllCoordinates(Point upperLeft, Point lowerRight)
@@ -51,7 +37,7 @@ public class Square : Figure
         var yVector = lowerRight.Y - upperLeft.Y;
 
         var xPerpendicular = -yVector / 2; //Here;
-        var yPerpendicular = xVector/2; //Here
+        var yPerpendicular = xVector / 2; //Here
 
         var upperRight = new Point(xCenter - xPerpendicular, yCenter - yPerpendicular);
         var lowerLeft = new Point(xCenter + xPerpendicular, yCenter + yPerpendicular);
@@ -85,7 +71,7 @@ public class Square : Figure
         return Math.Abs(trianglesArea - squareArea) < epsilon;
     }
 
-    public void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
     {
         var deltaX1 = Math.Abs(_upperLeft.X - startPoint.X);
         var deltaY1 = Math.Abs(startPoint.Y - _upperLeft.Y);
@@ -117,7 +103,7 @@ public class Square : Figure
                distance4 <= pointRadius;
     }
 
-    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
     {
         var pointRadius = 5;
 
@@ -162,6 +148,18 @@ public class Square : Figure
             _lowerLeft = tempSquare._lowerLeft;
         }
     }
+
+    public override void ScalingCoordinates(float scaleX, float scaleY)
+    {
+        _upperLeft = new Point((int)(_upperLeft.X * scaleX), (int)(_upperLeft.Y * scaleY));
+        _lowerRight = new Point((int)(_lowerRight.X * scaleX), (int)(_lowerRight.Y * scaleY));
+        
+        var tempSquare = FindAllCoordinates(_upperLeft, _lowerRight);
+        
+        _upperRight = tempSquare._upperRight;
+        _lowerLeft = tempSquare._lowerLeft;
+    }
+
     public override string ToString()
     {
         var result = $"Square:  " +

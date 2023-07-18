@@ -32,4 +32,10 @@ public static class Mathematics
 
         return degrees;
     }
+    
+    public static bool IsPointOnRay(Point firstPoint, Point secondPoint, Point testPoint)
+    {
+        return (testPoint.X - firstPoint.X) * (secondPoint.Y - firstPoint.Y) -
+            (secondPoint.X - firstPoint.X) * (testPoint.Y - firstPoint.Y) == 0;
+    }
 }

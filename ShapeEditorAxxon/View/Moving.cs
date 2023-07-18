@@ -1,76 +1,76 @@
-namespace ShapeEditorAxxon;
+namespace ShapeEditorAxxon.View;
 
-public class Moving
+public static class Moving
 {
-    public static void MoveSquare(PictureBox pictureBox, Point startPoint, Point finishPoint, Square square)
+    public static void MoveFigure(DoubleBufferedPictureBox pictureBox, Point startPoint, Point finishPoint, 
+        Figure figure, List<Figure> figures)
     {
-        Drawing.PaintOverSquare(pictureBox, square);
-        
-        square.FindCoordinatesAfterMoving(startPoint, finishPoint);
-
-        Drawing.DrawSquare(pictureBox, square, Color.Black);
-    }
-
-    public static void MoveTriangle(PictureBox pictureBox, Point startPoint, Point finishPoint, Triangle triangle)
-    {
-        Drawing.PaintOverTriangle(pictureBox, triangle);
-        
-        triangle.FindCoordinatesAfterMoving(startPoint, finishPoint);
-
-        Drawing.DrawTriangle(pictureBox, triangle, Color.Black);
-    }
-
-    public static void MoveCircle(PictureBox pictureBox, Point startPoint, Point finishPoint, Circle circle)
-    {
-        Drawing.PaintOverCircle(pictureBox, circle);
-        
-        circle.FindCoordinatesAfterMoving(startPoint, finishPoint);
-
-        Drawing.DrawCircle(pictureBox, circle, Color.Black);
-    }
-
-    public static void MoveQuadrangle(PictureBox pictureBox, Point startPoint, Point finishPoint, Quadrangle quadrangle)
-    {
-        Drawing.PaintOverQuadrangle(pictureBox, quadrangle);
-        
-        quadrangle.FindCoordinatesAfterMoving(startPoint, finishPoint);
-        
-        Drawing.DrawQuadrangle(pictureBox, quadrangle, Color.Black);
-    }
+        var buffer = new Bitmap(pictureBox.Width, pictureBox.Height);
     
-    public static void MoveSquareNode(PictureBox pictureBox, Point startPoint, Point finishPoint, Square square)
-    {
-        Drawing.PaintOverSquare(pictureBox, square);
-        
-        square.FindCoordinatesAfterChanging(startPoint, finishPoint);
+        using (var g = Graphics.FromImage(buffer))
+        {
+            Drawing.PaintOverFigure(pictureBox, figure);
+            
+            var offsetX = finishPoint.X - startPoint.X;
+            var offsetY = finishPoint.Y - startPoint.Y;
 
-        Drawing.DrawSquare(pictureBox, square, Color.Black);
+            if (figure is Circle circle)
+            {
+                var newLocation = new Point((int)(circle.Center.X + offsetX + circle.Radius),
+                    (int)(circle.Center.Y + offsetY + circle.Radius));
+                var newLocation1 = new Point((int)(circle.Center.X + offsetX - circle.Radius),
+                    (int)(circle.Center.Y + offsetY - circle.Radius));
+                
+                if (newLocation1.X <= 0 || newLocation1.Y <= 0 || 
+                    newLocation.X >= pictureBox.Width || newLocation.Y >= pictureBox.Height)
+                {
+                    pictureBox.Image = buffer;
+                    return;
+                }
+            }
+            
+            foreach (var point in figure.GetPoints())
+            {
+                var newLocation = new Point(point.X + offsetX, point.Y + offsetY);
+                if (newLocation.X < 0 || newLocation.Y < 0 || 
+                    newLocation.X >= pictureBox.Width || newLocation.Y >= pictureBox.Height)
+                {
+                    pictureBox.Image = buffer;
+                    return;
+                }
+            }
+            figure.FindCoordinatesAfterMoving(startPoint, finishPoint);
+
+            var figuresWithoutCurrent = new List<Figure>(figures);
+            figuresWithoutCurrent.Remove(figure);
+            Drawing.RedrawFigures(figuresWithoutCurrent, pictureBox);
+            Drawing.DrawFigure(pictureBox, figure, Color.Black);
+        }
+        
+        pictureBox.Image = buffer;
     }
 
-    public static void MoveTriangleNode(PictureBox pictureBox, Point startPoint, Point finishPoint, Triangle triangle)
+    public static void MoveFigureNode(DoubleBufferedPictureBox pictureBox, Point startPoint, Point finishPoint,
+        Figure figure, List<Figure> figures)
     {
-        Drawing.PaintOverTriangle(pictureBox, triangle);
-        
-        triangle.FindCoordinatesAfterChanging(startPoint, finishPoint);
+        var buffer = new Bitmap(pictureBox.Width, pictureBox.Height);
+    
+        using (var g = Graphics.FromImage(buffer))
+        {
+            Drawing.PaintOverFigure(pictureBox, figure);
 
-        Drawing.DrawTriangle(pictureBox, triangle, Color.Black);
-    }
-
-    public static void MoveCircleNode(PictureBox pictureBox, Point startPoint, Point finishPoint, Circle circle)
-    {
-        Drawing.PaintOverCircle(pictureBox, circle);
+            if (finishPoint.X > 0 && finishPoint.X < pictureBox.Width && finishPoint.Y > 0 &&
+                finishPoint.Y < pictureBox.Height)
+            {
+                figure.FindCoordinatesAfterChanging(startPoint, finishPoint);
+            
+                var figuresWithoutCurrent = new List<Figure>(figures);
+                figuresWithoutCurrent.Remove(figure);
+                Drawing.RedrawFigures(figuresWithoutCurrent, pictureBox);
+                Drawing.DrawFigure(pictureBox, figure, Color.Black);
+            }
+        }
         
-        circle.FindCoordinatesAfterChanging(startPoint, finishPoint);
-
-        Drawing.DrawCircle(pictureBox, circle, Color.Black);
-    }
-
-    public static void MoveQuadrangleNode(PictureBox pictureBox, Point startPoint, Point finishPoint, Quadrangle quadrangle)
-    {
-        Drawing.PaintOverQuadrangle(pictureBox, quadrangle);
-        
-        quadrangle.FindCoordinatesAfterChanging(startPoint, finishPoint);
-        
-        Drawing.DrawQuadrangle(pictureBox, quadrangle, Color.Black);
+        pictureBox.Image = buffer;
     }
 }

@@ -1,16 +1,15 @@
-﻿using System.Runtime.Serialization;
+﻿namespace ShapeEditorAxxon;
 
-namespace ShapeEditorAxxon;
-
-[DataContract]
 public class Triangle : Figure
 {
-    [DataMember]
     private Point _firstPoint;
-    [DataMember]
     private Point _secondPoint;
-    [DataMember]
     private Point _thirdPoint;
+
+    public Triangle()
+    {
+        
+    }
 
     public Triangle(Point firstPoint, Point secondPoint, Point thirdPoint)
     {
@@ -18,22 +17,15 @@ public class Triangle : Figure
         _secondPoint = secondPoint;
         _thirdPoint = thirdPoint;
     }
-
-    public Point GetFirstPoint()
-    {
-        return _firstPoint;
-    }
-
-    public Point GetSecondPoint()
-    {
-        return _secondPoint;
-    }
-
-    public Point GetThirdPoint()
-    {
-        return _thirdPoint;
-    }
     
+    public override List<Point> GetPoints()
+    {
+        return new List<Point>()
+        {
+            _firstPoint, _secondPoint, _thirdPoint
+        };
+    }
+
     public override double CalculateArea()
     {
         var side1 = Mathematics.CalculateDistance(_firstPoint, _secondPoint);
@@ -62,7 +54,7 @@ public class Triangle : Figure
         return Math.Abs(trianglesArea - triangleArea) < epsilon;
     }
 
-    public void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterMoving(Point startPoint, Point finishPoint)
     {
         var deltaX1 = startPoint.X - _firstPoint.X;
         var deltaY1 = startPoint.Y - _firstPoint.Y;
@@ -94,7 +86,7 @@ public class Triangle : Figure
         return distance1 <= pointRadius || distance2 <= pointRadius || distance3 <= pointRadius;
     }
 
-    public void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
+    public override void FindCoordinatesAfterChanging(Point startPoint, Point finishPoint)
     {
         var pointRadius = 5;
 
@@ -106,6 +98,13 @@ public class Triangle : Figure
         else if (distance2 <= pointRadius)
             _secondPoint = finishPoint;
         else _thirdPoint = finishPoint;
+    }
+    
+    public override void ScalingCoordinates(float scaleX, float scaleY)
+    {
+        _firstPoint = new Point((int)(_firstPoint.X * scaleX), (int)(_firstPoint.Y * scaleY));
+        _secondPoint = new Point((int)(_secondPoint.X * scaleX), (int)(_secondPoint.Y * scaleY));
+        _thirdPoint = new Point((int)(_thirdPoint.X * scaleX), (int)(_thirdPoint.Y * scaleY));
     }
     
     public override string ToString()

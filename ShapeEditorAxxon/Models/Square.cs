@@ -30,6 +30,9 @@ public class Square : Figure
 
     public static Square FindAllCoordinates(Point upperLeft, Point lowerRight)
     {
+        if (upperLeft.Y < lowerRight.Y)
+            (upperLeft, lowerRight) = (lowerRight, upperLeft);
+        
         var xCenter = (upperLeft.X + lowerRight.X) / 2;
         var yCenter = (upperLeft.Y + lowerRight.Y) / 2;
 

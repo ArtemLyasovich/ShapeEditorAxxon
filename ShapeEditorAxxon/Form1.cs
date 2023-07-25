@@ -397,6 +397,7 @@ public partial class Form1 : Form
             if (_finishLocation.X > pictureBox1.Width) _finishLocation.X = pictureBox1.Width;
             if (_finishLocation.Y < 0) _finishLocation.Y = 0;
             if (_finishLocation.Y > pictureBox1.Height) _finishLocation.Y = pictureBox1.Height;
+
             Moving.MoveFigure(pictureBox1, _startLocation, _finishLocation, _selectedFigure, _figures);
             _startLocation = _finishLocation;
         }

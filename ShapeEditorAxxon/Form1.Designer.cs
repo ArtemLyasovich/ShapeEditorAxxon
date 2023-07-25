@@ -52,7 +52,7 @@ partial class Form1
         //
         // PictureBoxTimerTimer
         // 
-        timer2.Interval = 50;
+        timer2.Interval = 250;
         timer2.Elapsed += Timer2_Elapsed;
         timer2.Start();
         //
